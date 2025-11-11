@@ -152,18 +152,60 @@ eventBus.on("products:loadMore", async () => {
   }
 });
 
-// 3) 카드 클릭 시 SPA 네비게이션
-const handleCardClick = (event) => {
+// 3) 카드/헤더 인터랙션 핸들러
+const handleClick = (event) => {
+  // Header
+  const cartIconButton = event.target.closest("#cart-icon-btn");
+  if (cartIconButton) {
+    const cartModal = document.querySelector("#cart-modal");
+    if (!cartModal) {
+      return;
+    }
+
+    const isHidden = cartModal.classList.toggle("hidden");
+    cartModal.setAttribute("aria-hidden", isHidden ? "true" : "false");
+
+    return;
+  }
+
+  // Cart Modal
+  const cartModalCloseButton = event.target.closest("#cart-modal-close-btn");
+  if (cartModalCloseButton) {
+    const cartModal = document.querySelector("#cart-modal");
+    if (!cartModal) {
+      return;
+    }
+
+    const isHidden = cartModal.classList.toggle("hidden");
+    cartModal.setAttribute("aria-hidden", isHidden ? "true" : "false");
+
+    return;
+  }
+
+  // Product Card
+  const addToCartButton = event.target.closest(".add-to-cart-btn");
+  if (addToCartButton) {
+    const productId = addToCartButton.dataset.productId;
+    if (!productId) {
+      return;
+    }
+
+    console.log(productId);
+
+    return;
+  }
+
   const card = event.target.closest(".product-card");
-  if (!card) return;
+  if (card) {
+    const productId = card.dataset.productId;
+    if (!productId) return;
 
-  const productId = card.dataset.productId;
-  if (!productId) return;
-
-  router.push(`/products/${productId}`);
+    router.push(`/products/${productId}`);
+    return;
+  }
 };
 
-document.body.addEventListener("click", handleCardClick);
+document.body.addEventListener("click", handleClick);
 
 // 4) 애플리케이션 시작
 const startApp = () => {

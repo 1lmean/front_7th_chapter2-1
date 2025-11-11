@@ -26,7 +26,7 @@ export const Loading = /*html*/ `
 const ProductItem = ({ productId, title, image, lprice }) => {
   const contentView = /*html*/ `
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden product-card"
-            data-product-id=${productId}>
+            data-product-id="${productId}">
         <!-- 상품 이미지 -->
         <div class="aspect-square bg-gray-100 overflow-hidden cursor-pointer product-image">
             <img src="${image}"
@@ -47,7 +47,8 @@ const ProductItem = ({ productId, title, image, lprice }) => {
             </div>
             <!-- 장바구니 버튼 -->
             <button class="w-full bg-blue-600 text-white text-sm py-2 px-3 rounded-md
-                    hover:bg-blue-700 transition-colors add-to-cart-btn" data-product-id="85067212996">
+                    hover:bg-blue-700 transition-colors add-to-cart-btn"
+                    data-product-id="${productId}">
             장바구니 담기
             </button>
         </div>
@@ -89,7 +90,7 @@ export const ProductList = ({ products = [], loading = false, pagination = {} } 
           </span>
         </div>
     `;
-  return `
+  return /*html*/ `
     <div class="mb-6" data-product-list>
         <div>
         <!-- 상품 그리드 -->
