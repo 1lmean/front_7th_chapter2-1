@@ -2,6 +2,8 @@ import { createRouter } from "./router/Router.js";
 import { Homepage } from "./pages/Homepage.js";
 import { DetailPage } from "./pages/DetailPage.js";
 import { getProducts, getProduct } from "./api/productApi.js";
+import { eventBus } from "./utils/EventBus.js";
+import { attachSearchFormEnhancer } from "./router/enhancers/searchForm.js";
 
 const enableMocking = () =>
   import("./mocks/browser.js").then(({ worker }) => worker.start({ onUnhandledRequest: "bypass" }));
@@ -10,12 +12,22 @@ const enableMocking = () =>
 const routes = [
   {
     path: "/",
-    element: async () => {
+    element: async ({ query }) => {
       const root = document.querySelector("#root");
-      root.innerHTML = Homepage({ loading: true });
+      root.innerHTML = Homepage({ loading: true, filters: query });
 
-      const data = await getProducts();
-      return Homepage({ loading: false, ...data });
+      const data = await getProducts(query);
+      const mergedFilters = {
+        ...query,
+        ...(data?.filters ?? {}),
+      };
+
+      return Homepage({
+        loading: false,
+        filters: mergedFilters,
+        products: data?.products ?? [],
+        pagination: data?.pagination,
+      });
     },
   },
   {
@@ -36,11 +48,18 @@ const router = createRouter({
   rootSelector: "#root",
 });
 
+eventBus.on("filters:change", (params) => {
+  const search = params instanceof URLSearchParams ? params.toString() : new URLSearchParams(params).toString();
+  const url = search ? `/?${search}` : "/";
+  router.push(url);
+});
+
+attachSearchFormEnhancer(router);
+
 // 3) 카드 클릭 시 SPA 네비게이션
 const handleCardClick = (event) => {
   const card = event.target.closest(".product-card");
   if (!card) return;
-  console.log("card", card);
 
   const productId = card.dataset.productId;
   if (!productId) return;
