@@ -65,7 +65,21 @@ const routes = [
       root.innerHTML = DetailPage({ loading: true });
 
       const product = await getProduct(params.id);
-      return DetailPage({ loading: false, ...product });
+
+      // 관련 상품 가져오기 (같은 category2, 현재 상품 제외)
+      let relatedProducts = [];
+      if (product.category2) {
+        const relatedProductsData = await getProducts({
+          category2: product.category2,
+          limit: 10,
+          sort: "price_asc",
+        });
+        relatedProducts = (relatedProductsData?.products || [])
+          .filter((item) => item.productId !== product.productId)
+          .slice(0, 4); // 최대 4개만 표시
+      }
+
+      return DetailPage({ loading: false, relatedProducts, ...product });
     },
   },
 ];

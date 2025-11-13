@@ -105,6 +105,24 @@ const handleDetailPageClick = (event) => {
     return;
   }
 
+  // 관련 상품 카드 클릭 처리
+  const relatedProductCard = event.target.closest(".related-product-card");
+  if (relatedProductCard && routerInstance) {
+    event.preventDefault();
+
+    const productId = relatedProductCard.dataset.productId;
+    if (!productId) {
+      return;
+    }
+
+    // 현재 필터 상태 저장
+    const currentFilters = Object.fromEntries(new URLSearchParams(window.location.search));
+    sessionStorage.setItem("previousHomepageFilters", JSON.stringify(currentFilters));
+
+    routerInstance.push(`/products/${productId}`);
+    return;
+  }
+
   // DetailPage 장바구니 담기 버튼
   const addToCartButton = event.target.closest("#add-to-cart-btn");
   if (addToCartButton) {
