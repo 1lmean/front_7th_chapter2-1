@@ -20,6 +20,31 @@ const handleFormChange = (event) => {
   }
 };
 
+const handleSearchInputKeydown = (event) => {
+  if (event.key !== "Enter") {
+    return;
+  }
+
+  const searchInput = event.target;
+  if (!searchInput || !searchInput.matches("#search-input")) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const searchValue = searchInput.value.trim();
+  const params = new URLSearchParams(window.location.search);
+
+  if (searchValue) {
+    params.set("search", searchValue);
+  } else {
+    params.delete("search");
+  }
+  params.delete("page");
+
+  eventBus.emit("filters:change", params);
+};
+
 const bindSearchFormListeners = () => {
   const root = document.querySelector("#root");
   if (!root) {
@@ -31,10 +56,18 @@ const bindSearchFormListeners = () => {
     return () => {};
   }
 
+  const searchInput = searchForm.querySelector("#search-input");
+
   searchForm.addEventListener("change", handleFormChange);
+  if (searchInput) {
+    searchInput.addEventListener("keydown", handleSearchInputKeydown);
+  }
 
   return () => {
     searchForm.removeEventListener("change", handleFormChange);
+    if (searchInput) {
+      searchInput.removeEventListener("keydown", handleSearchInputKeydown);
+    }
   };
 };
 
