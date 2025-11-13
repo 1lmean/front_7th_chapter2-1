@@ -80,9 +80,14 @@ jobs:
           fi
           # 루트에 index.html 생성 (리다이렉트용)
           echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=/front-7th-chapter2-1/"></head><body><script>window.location.href="/front-7th-chapter2-1/";</script></body></html>' > dist/index.html
+          # 404.html도 루트에 복사 (GitHub Pages 404 핸들링용)
+          cp dist/front-7th-chapter2-1/index.html dist/404.html
           echo "=== After restructuring ==="
           ls -la dist/
           ls -la dist/front-7th-chapter2-1/ || echo "No front-7th-chapter2-1 folder"
+          echo ""
+          echo "=== Checking HTML paths ==="
+          head -25 dist/front-7th-chapter2-1/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
