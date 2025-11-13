@@ -1,7 +1,83 @@
-export const SearchForm = ({ filters = {} } = {}) => {
+const renderCategory1Buttons = (categories = {}, selectedCategory1 = "") => {
+  const category1Names = Object.keys(categories);
+  if (category1Names.length === 0) {
+    return '<div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>';
+  }
+
+  return category1Names
+    .map((cat1) => {
+      const isSelected = cat1 === selectedCategory1;
+      return `<button 
+        data-category1="${cat1}" 
+        class="text-left px-3 py-2 text-sm rounded-md border transition-colors ${
+          isSelected
+            ? "bg-blue-100 border-blue-300 text-blue-800"
+            : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+        }">${cat1}</button>`;
+    })
+    .join("");
+};
+
+const renderCategory2Buttons = (categories = {}, selectedCategory1 = "", selectedCategory2 = "") => {
+  if (!selectedCategory1 || !categories[selectedCategory1]) {
+    return "";
+  }
+
+  const category2Names = Object.keys(categories[selectedCategory1]);
+  if (category2Names.length === 0) {
+    return "";
+  }
+
+  return `<div class="flex flex-wrap gap-2 mt-2">
+    ${category2Names
+      .map((cat2) => {
+        const isSelected = cat2 === selectedCategory2;
+        return `<button 
+          data-category1="${selectedCategory1}" 
+          data-category2="${cat2}" 
+          class="text-left px-3 py-2 text-sm rounded-md border transition-colors ${
+            isSelected
+              ? "bg-blue-100 border-blue-300 text-blue-800"
+              : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+          }">${cat2}</button>`;
+      })
+      .join("")}
+  </div>`;
+};
+
+const renderBreadcrumb = (selectedCategory1 = "", selectedCategory2 = "", allCategory1Names = []) => {
+  const breadcrumbParts = ['<label class="text-sm text-gray-600">카테고리:</label>'];
+
+  breadcrumbParts.push(
+    '<button data-breadcrumb="reset" class="text-xs hover:text-blue-800 hover:underline">전체</button>',
+  );
+
+  if (selectedCategory1) {
+    breadcrumbParts.push('<span class="text-xs text-gray-500">&gt;</span>');
+    breadcrumbParts.push(
+      `<button data-breadcrumb="category1" data-category1="${selectedCategory1}" class="text-xs hover:text-blue-800 hover:underline">${selectedCategory1}</button>`,
+    );
+  }
+
+  if (selectedCategory2) {
+    breadcrumbParts.push('<span class="text-xs text-gray-500">&gt;</span>');
+    breadcrumbParts.push(`<span class="text-xs text-gray-600 cursor-default">${selectedCategory2}</span>`);
+  }
+
+  if (!selectedCategory1 && !selectedCategory2 && allCategory1Names.length > 0) {
+    breadcrumbParts.push(`<span class="text-xs text-gray-600">${allCategory1Names.join(" ")}</span>`);
+  }
+
+  return breadcrumbParts.join("");
+};
+
+export const SearchForm = ({ filters = {}, categories = {} } = {}) => {
   const limit = String(filters.limit ?? "20");
   const sort = String(filters.sort ?? "price_asc");
   const keyword = filters.search ?? filters.query ?? "";
+  const selectedCategory1 = filters.category1 ?? "";
+  const selectedCategory2 = filters.category2 ?? "";
+  const allCategory1Names = Object.keys(categories);
 
   const contentView = /*html*/ `
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4" data-search-form>
@@ -22,15 +98,17 @@ export const SearchForm = ({ filters = {} } = {}) => {
             <div class="space-y-3">
             <!-- 카테고리 필터 -->
             <div class="space-y-2">
-                <div class="flex items-center gap-2">
-                <label class="text-sm text-gray-600">카테고리:</label>
-                <button data-breadcrumb="reset" class="text-xs hover:text-blue-800 hover:underline">전체</button>
+                <div class="flex items-center gap-2 flex-wrap">
+                ${renderBreadcrumb(selectedCategory1, selectedCategory2, allCategory1Names)}
                 </div>
                 <!-- 1depth 카테고리 -->
-                <div class="flex flex-wrap gap-2">
-                <div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>
+                <div class="flex flex-wrap gap-2" data-category1-container>
+                ${renderCategory1Buttons(categories, selectedCategory1)}
                 </div>
                 <!-- 2depth 카테고리 -->
+                <div data-category2-container>
+                ${renderCategory2Buttons(categories, selectedCategory1, selectedCategory2)}
+                </div>
             </div>
             <!-- 기존 필터들 -->
             <div class="flex gap-2 items-center justify-between">

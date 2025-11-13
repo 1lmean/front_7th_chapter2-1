@@ -1,7 +1,7 @@
 import { createRouter } from "./router/Router.js";
 import { Homepage } from "./pages/Homepage.js";
 import { DetailPage } from "./pages/DetailPage.js";
-import { getProducts, getProduct } from "./api/productApi.js";
+import { getProducts, getProduct, getCategories } from "./api/productApi.js";
 import { attachSearchFormEnhancer } from "./router/enhancers/searchForm.js";
 import { attachProductListEnhancer } from "./router/enhancers/productList.js";
 import { registerHomepageEvents } from "./events/homepageEvents.js";
@@ -29,15 +29,18 @@ const routes = [
       resetHomepageState();
 
       const root = document.querySelector("#root");
-      root.innerHTML = Homepage({ loading: true, filters: query });
 
-      const data = await getProducts(query);
+      // 카테고리 목록과 상품 목록을 병렬로 가져오기
+      const [categoriesData, productsData] = await Promise.all([getCategories().catch(() => ({})), getProducts(query)]);
+
+      root.innerHTML = Homepage({ loading: true, filters: query, categories: categoriesData });
+
       const mergedFilters = {
         ...query,
-        ...(data?.filters ?? {}),
+        ...(productsData?.filters ?? {}),
       };
-      const products = Array.isArray(data?.products) ? data.products : [];
-      const pagination = data?.pagination ?? null;
+      const products = Array.isArray(productsData?.products) ? productsData.products : [];
+      const pagination = productsData?.pagination ?? null;
 
       setHomepageState({
         filters: mergedFilters,
@@ -51,6 +54,7 @@ const routes = [
         filters: mergedFilters,
         products,
         pagination,
+        categories: categoriesData,
       });
     },
   },
