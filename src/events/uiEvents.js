@@ -43,7 +43,15 @@ const handleUIClick = (event) => {
 
   const cartModalCloseButton = event.target.closest("#cart-modal-close-btn");
   if (cartModalCloseButton) {
-    toggleCartModal();
+    hideCartModal();
+    return;
+  }
+
+  // 모달 배경 클릭 시 닫기
+  const cartModal = event.target.closest("#cart-modal");
+  if (cartModal && event.target === cartModal) {
+    hideCartModal();
+    return;
   }
 };
 
