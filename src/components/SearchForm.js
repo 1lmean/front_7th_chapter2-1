@@ -1,4 +1,8 @@
 const renderCategory1Buttons = (categories = {}, selectedCategory1 = "") => {
+  if (!categories || typeof categories !== "object") {
+    return '<div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>';
+  }
+
   const category1Names = Object.keys(categories);
   if (category1Names.length === 0) {
     return '<div class="text-sm text-gray-500 italic">카테고리 로딩 중...</div>';

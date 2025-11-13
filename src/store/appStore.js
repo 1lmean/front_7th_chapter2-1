@@ -5,7 +5,7 @@ const createHomepageState = () => ({
   isLoadingMore: false,
 });
 
-const CART_STORAGE_KEY = "cart";
+const CART_STORAGE_KEY = "shopping_cart";
 
 const createCartState = () => ({
   items: [],

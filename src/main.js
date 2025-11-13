@@ -30,10 +30,11 @@ const routes = [
 
       const root = document.querySelector("#root");
 
+      // 먼저 로딩 상태로 렌더링 (카테고리 로딩 중 표시를 위해)
+      root.innerHTML = Homepage({ loading: true, filters: query, categories: undefined });
+
       // 카테고리 목록과 상품 목록을 병렬로 가져오기
       const [categoriesData, productsData] = await Promise.all([getCategories().catch(() => ({})), getProducts(query)]);
-
-      root.innerHTML = Homepage({ loading: true, filters: query, categories: categoriesData });
 
       const mergedFilters = {
         ...query,
