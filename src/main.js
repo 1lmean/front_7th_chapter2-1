@@ -80,7 +80,7 @@ attachSearchFormEnhancer(router);
 attachProductListEnhancer(router);
 registerHomepageEvents(router);
 registerUIEvents();
-registerDetailPageEvents();
+registerDetailPageEvents(router);
 setupCartModal(router);
 setupHeader(router);
 

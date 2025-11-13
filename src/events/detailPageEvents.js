@@ -1,5 +1,8 @@
 import { appendCartProduct } from "../store/appStore.js";
 
+// router는 registerDetailPageEvents에서 주입받을 수 있도록 클로저로 관리
+let routerInstance = null;
+
 const handleQuantityChange = (event) => {
   const quantityInput = document.querySelector("#quantity-input");
   if (!quantityInput) {
@@ -30,6 +33,30 @@ const handleQuantityChange = (event) => {
 };
 
 const handleDetailPageClick = (event) => {
+  // 카테고리 브레드크럼 클릭 처리
+  const breadcrumbLink = event.target.closest(".breadcrumb-link");
+  if (breadcrumbLink && routerInstance) {
+    event.preventDefault();
+
+    const category1 = breadcrumbLink.dataset.category1;
+    const category2 = breadcrumbLink.dataset.category2;
+
+    const params = new URLSearchParams();
+
+    if (category2) {
+      // 2차 카테고리 클릭 시 1차와 2차 모두 선택
+      params.set("category1", category1 || "");
+      params.set("category2", category2);
+    } else if (category1) {
+      // 1차 카테고리 클릭 시 1차만 선택
+      params.set("category1", category1);
+    }
+
+    const url = params.toString() ? `/?${params.toString()}` : "/";
+    routerInstance.push(url);
+    return;
+  }
+
   // 수량 버튼 클릭 처리
   const quantityButton = event.target.closest("#quantity-increase, #quantity-decrease");
   if (quantityButton) {
@@ -71,6 +98,7 @@ const handleDetailPageClick = (event) => {
   }
 };
 
-export const registerDetailPageEvents = () => {
+export const registerDetailPageEvents = (router) => {
+  routerInstance = router;
   document.body.addEventListener("click", handleDetailPageClick);
 };
