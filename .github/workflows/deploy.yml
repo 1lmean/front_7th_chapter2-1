@@ -40,11 +40,25 @@ jobs:
 
       - name: Verify build output
         run: |
+          echo "=== Dist folder contents ==="
           ls -la dist/
-          echo "--- index.html ---"
+          echo ""
+          echo "=== Assets folder ==="
+          ls -la dist/assets/ || echo "No assets folder"
+          echo ""
+          echo "=== index.html content ==="
           head -25 dist/index.html
-          echo "--- 404.html exists ---"
-          test -f dist/404.html && echo "404.html exists" || echo "404.html missing"
+          echo ""
+          echo "=== 404.html check ==="
+          if [ -f dist/404.html ]; then
+            echo "✓ 404.html exists"
+            echo "First 5 lines of 404.html:"
+            head -5 dist/404.html
+          else
+            echo "✗ 404.html missing - creating it now"
+            cp dist/index.html dist/404.html
+            echo "✓ 404.html created"
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
