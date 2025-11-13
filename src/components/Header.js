@@ -1,3 +1,48 @@
+import { getCartState, subscribe } from "../store/appStore.js";
+
+const updateCartBadge = () => {
+  const cartIconButton = document.querySelector("#cart-icon-btn");
+  if (!cartIconButton) {
+    return;
+  }
+
+  let badge = cartIconButton.querySelector("[data-cart-badge]");
+  const cartState = getCartState();
+  const itemCount = cartState.items.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+
+  if (itemCount > 0) {
+    if (!badge) {
+      badge = document.createElement("span");
+      badge.setAttribute("data-cart-badge", "");
+      badge.className =
+        "absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center";
+      cartIconButton.appendChild(badge);
+    }
+    badge.textContent = itemCount > 99 ? "99+" : String(itemCount);
+  } else if (badge) {
+    badge.remove();
+  }
+};
+
+let isSetup = false;
+
+export const setupHeader = (router) => {
+  if (isSetup) {
+    return;
+  }
+
+  isSetup = true;
+
+  const ensureUpdated = () => {
+    requestAnimationFrame(updateCartBadge);
+  };
+
+  subscribe(ensureUpdated);
+  router?.subscribe?.(ensureUpdated);
+
+  ensureUpdated();
+};
+
 export const Header = () => {
   const contentView = /*html*/ `
     <header class="bg-white shadow-sm sticky top-0 z-40">
