@@ -1,6 +1,42 @@
 import { appendCartProduct } from "../store/appStore.js";
 
+const handleQuantityChange = (event) => {
+  const quantityInput = document.querySelector("#quantity-input");
+  if (!quantityInput) {
+    return;
+  }
+
+  const button = event.target.closest("#quantity-increase, #quantity-decrease");
+  if (!button) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const currentValue = Number(quantityInput.value) || 1;
+  const min = Number(quantityInput.min) || 1;
+  const max = Number(quantityInput.max) || 999;
+  let newValue = currentValue;
+
+  if (button.id === "quantity-increase") {
+    // 증가 버튼
+    newValue = Math.min(currentValue + 1, max);
+  } else if (button.id === "quantity-decrease") {
+    // 감소 버튼
+    newValue = Math.max(currentValue - 1, min);
+  }
+
+  quantityInput.value = String(newValue);
+};
+
 const handleDetailPageClick = (event) => {
+  // 수량 버튼 클릭 처리
+  const quantityButton = event.target.closest("#quantity-increase, #quantity-decrease");
+  if (quantityButton) {
+    handleQuantityChange(event);
+    return;
+  }
+
   // DetailPage 장바구니 담기 버튼
   const addToCartButton = event.target.closest("#add-to-cart-btn");
   if (addToCartButton) {
